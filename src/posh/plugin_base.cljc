@@ -259,18 +259,20 @@
           (if (seq inputs)
             (recur
               ;; new inputs
-              (mapcat #(get-in graph [% :outputs]))
+              (mapcat #(get-in graph [% :outputs]) inputs)
               (->> inputs
                    (filter #(get-in cache [% :reload-fn]))
                    (concat cache-keys)))
-            cache-keys))
+            (set cache-keys)))
 
         changed-cache
         (->> to-update-cache-keys
-             (map #(vector % ((get-in cache [:reload-fn %])
+             (map #(vector % ((get-in cache [% :reload-fn])
                               @posh-atom %)))
-             (filter #(not= (get cache (first %))
-                            (second %)))
+             ;; TODO(Dvd): Expiermenting with only
+             ;; results check
+             (filter #(not= (get-in cache [(first %) :results])
+                            (:results (second %))))
              (into {}))]
     ;; Update ratoms
     (doseq [[k v] changed-cache]
@@ -278,7 +280,9 @@
               (get k)
               (reset! (:results v))))
     (swap! posh-atom update
-           :cache merge changed-cache)))
+           :cache merge changed-cache)
+    :done))
+
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
