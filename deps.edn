@@ -1,2 +1,6 @@
 {:paths ["src"]
- :deps {org.clojure/core.match {:mvn/version "0.3.0"}}}
+ :deps {org.clojure/core.match {:mvn/version "0.3.0"}}
+ :default-deps {org.clojure/clojure {:mvn/version "1.10.1"}
+                org.clojure/clojurescript {:mvn/version "1.10.520"}
+                datascript "1.0.1"
+                reagent "0.9.0-rc2"}}
